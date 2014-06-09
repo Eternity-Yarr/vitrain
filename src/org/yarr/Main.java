@@ -1,14 +1,26 @@
 package org.yarr;
 
+import org.yarr.Pages.notFound;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.SimpleLogger;
+import org.webbitserver.*;
+import org.webbitserver.handler.StaticFileHandler;
+import org.yarr.Pages.indexPage;
 
 public class Main {
     private static Logger log;
     private static Sessions ss = new Sessions();
+    private static int WS_PORT = 6633;
+
+    public static void standardResponse(HttpResponse response)
+    {
+        response.header("Content-type","text/html; charset=UTF-8");
+        response.header("Vary","Accept-Encoding");
+    }
 
     public static void main(String[] args) {
+
         System.setProperty(SimpleLogger.SHOW_DATE_TIME_KEY,"true");
         System.setProperty(SimpleLogger.WARN_LEVEL_STRING_KEY,"!!!");
         System.setProperty(SimpleLogger.DATE_TIME_FORMAT_KEY, "yyyy-MM-dd HH:mm:ss:SSS");
@@ -16,5 +28,19 @@ public class Main {
 
         log = LoggerFactory.getLogger(Main.class);
         log.debug("Creating server");
+        WebServer ws = WebServers.createWebServer(WS_PORT);
+        ws
+                .add(new StaticFileHandler("./var"))
+                .add("/", new indexPage())
+                .add(new notFound());
+
+        log.debug("Starting server at port {}", WS_PORT);
+
+        try
+        {
+            ws.start().get();
+        }
+        catch(Exception e){ log.error(e.toString(),e); }
+        // finally { ws.stop(); }
     }
 }
