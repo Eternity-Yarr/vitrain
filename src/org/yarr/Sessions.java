@@ -40,11 +40,13 @@ public class Sessions
     {
 
         String sid = String.valueOf(r.nextInt());
-        Session s = new Session();
+        String hash;
         if (md != null)
-            s.hash = String.valueOf(Hex.encodeHex(md.digest(sid.getBytes())));
+            hash = String.valueOf(Hex.encodeHex(md.digest(sid.getBytes())));
         else
-            s.hash = String.valueOf(sid);
+            hash = String.valueOf(sid);
+
+        Session s = new Session(hash);
         bucket.put(s.hash,s);
         return s;
     }

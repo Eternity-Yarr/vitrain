@@ -12,6 +12,7 @@
     <orderEntry type="library" name="org.slf4j:slf4j-simple:1.7.7" level="project" />
     <orderEntry type="library" name="org.apache.commons:com.springsource.org.apache.commons.codec:1.6.0" level="project" />
     <orderEntry type="library" name="netty-3.9.0.Final" level="project" />
+    <orderEntry type="library" name="gson-2.2.4-lostdj" level="project" />
   </component>
 </module>
 
