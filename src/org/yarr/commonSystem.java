@@ -8,6 +8,7 @@ import org.webbitserver.HttpRequest;
 import org.webbitserver.HttpResponse;
 
 import java.net.HttpCookie;
+import java.net.URI;
 
 import static org.yarr.Main.ss;
 import static org.yarr.Main.standardResponse;
@@ -24,25 +25,40 @@ public class commonSystem implements HttpHandler
     @Override
     public void handleHttpRequest(HttpRequest request, HttpResponse response, HttpControl control)
     {
-        String real_ip = request.header("X-Real-IP");
-        if (real_ip == null || real_ip.isEmpty())
-            real_ip = request.remoteAddress().toString();
-        log.info(String.format("[%s] %s %s", real_ip, request.method(), request.uri()));
+        boolean bad_request = false;
+        try
+        {
+            String path = URI.create(request.uri()).getPath();
+        }
+        catch(Exception e)
+        {
+            response.status(400);
+            response.content("Bad request!");
+            response.end();
+            bad_request = true;
+        }
+        if(!bad_request)
+        {
+            String real_ip = request.header("X-Real-IP");
+            if (real_ip == null || real_ip.isEmpty())
+                real_ip = request.remoteAddress().toString();
+            log.info(String.format("[%s] %s %s", real_ip, request.method(), request.uri()));
 
-        Session s;
-        if (request.cookie("vitrain") != null)
-            s = ss.getSession(request.cookieValue("vitrain"));
-        else
-            s = ss.newSession();
-        request.data("SESSION", s);
-        log.debug("Session set to {}", s.hash);
+            Session s;
+            if (request.cookie("vitrain") != null)
+                s = ss.getSession(request.cookieValue("vitrain"));
+            else
+                s = ss.newSession();
+            request.data("SESSION", s);
+            log.debug("Session set to {}", s.hash);
 
-        HttpCookie c = new HttpCookie("vitrain",s.hash);
-        c.setMaxAge(12*30*24*60*60); // About an year of MaxAge
-        c.setPath("/");
-        c.setVersion(0);
-        response.cookie(c);
+            HttpCookie c = new HttpCookie("vitrain",s.hash);
+            c.setMaxAge(12*30*24*60*60); // About an year of MaxAge
+            c.setPath("/");
+            c.setVersion(0);
+            response.cookie(c);
 
-        control.nextHandler();
+            control.nextHandler();
+        }
     }
 }

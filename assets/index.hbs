@@ -1,0 +1,103 @@
+<html>
+<head>
+    <title>ViTrain</title>
+    <link rel="stylesheet" href="/ext/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/ext/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="site-wrapper" id="content">
+
+    <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+            <div class="masthead clearfix">
+                <div class="inner">
+                    <h3 class="masthead-brand">The Game</h3>
+                    <ul class="nav masthead-nav">
+                        <li class="active"><a href="#">Home</a></li>
+                        <li class="disabled"><a>Leaders Board</a></li>
+                        <li class="disabled"><a>Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="inner cover">
+                <h1 class="cover-heading">Vim quiz</h1>
+                <p class="lead" id="buttons">
+                    <!--a href="#" class="btn btn-lg btn-default">Start game</a>
+
+                    <a href="#" class="btn btn-lg btn-default">Learn more</a>
+                    <a href="#" class="btn btn-lg btn-default">Learn more</a-->
+                </p>
+            </div>
+
+            {{#if session.name}}
+                <p class="lead">Hai {{session.name}}!</p>
+                    <dl class="dl-horizontal">
+                        <dt>Your game is</dt>
+                        <dd>{{#if session.game_started}}<span class="label label-warning">started</span>{{else}}<span class="label label-default">not started</span>{{/if}}</dd>
+                        <dt>Top score</dt>
+                        <dd>{{session.top_score}}</dd>
+                        <dt>Top rate</dt>
+                        <dd>{{session.top_rate}}</dd>
+                    {{#if session.game_started}}
+                        <dt>Current score:</dt>
+                        <dd>{{session.score}}</dd>
+                        <dt>Current rate</dt>
+                        <dd>{{session.rate}}</dd>
+                        <dt>Answered</dt>
+                        <dd>{{session.answered}}</dd>
+                        <button class="btn btn-lg btn-warning" id="endGame">End gaem</button>
+                    {{else}}
+                        <button class="btn btn-lg btn-success" id="startGame">Start gaem</button>
+                    {{/if}}
+                    </dl>
+                </p>
+            {{else}}
+                  <form class="form-inline" role="form" id="namer">
+                      My name is: <input class="form-control" type="text" name="name" id="name">
+                      <input  class="form-control" type="submit">
+                  </form>
+            {{/if}}
+
+            {{#if session.game_started}}
+            <div class="inner cover">
+                <h2>
+                   How to "{{question}}"?
+                </h2>
+                <form class="form-inline" role="form" id="quizer">
+                    <strong>:</strong>&nbsp;<input autocomplete="off" class="form-control" type="text" name="answer" id="answer" placeholder="answer!">
+                    <input class="form-control" type="submit" value="OK">
+                </form>
+            </div>
+            {{/if}}
+            <p>
+                <h3>
+                {{#if session.error}}
+                    <span class="label label-error">{{session.error}} {{#if session.tries}} Tried {{session.tries}} times! {{/if}} </span>
+                {{else}}
+                    <span class="label label-success">Right!</span>
+                {{/if}}
+                </h3>
+            </p>
+            <hr/>
+            <div class="mastfoot">
+                <div class="inner">
+                    <p>Vim trainer.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/js/jquery-2.1.1.min.js"></script>
+<script src="/ext/js/bootstrap.min.js"></script>
+<script src="/js/js.js"></script>
+</body>
+</html>

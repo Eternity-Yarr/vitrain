@@ -1,11 +1,22 @@
 package org.yarr.Pages;
 
+import com.github.jknack.handlebars.Context;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.context.FieldValueResolver;
+import com.github.jknack.handlebars.context.MapValueResolver;
+import com.github.jknack.handlebars.context.MethodValueResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpHandler;
 import org.webbitserver.HttpRequest;
 import org.webbitserver.HttpResponse;
+import org.yarr.Overrides.MyHandlebars;
+import org.yarr.Session;
+import org.yarr.VimKeys;
+
+import java.util.HashMap;
 
 import static org.yarr.Main.standardResponse;
 
@@ -43,7 +54,40 @@ public class indexPage implements HttpHandler
         @Override
         public void run()
         {
-            response.content("OK");
+            HashMap<String,Object> data = new HashMap<>();
+            Handlebars h = new MyHandlebars();
+            Context co = Context
+                    .newBuilder(data)
+                    .resolver(FieldValueResolver.INSTANCE, MapValueResolver.INSTANCE, MethodValueResolver.INSTANCE)
+                    .build();
+            Session session = (Session)request.data("SESSION");
+            try
+            {
+                Template t = h.compile("index");
+                VimKeys quiz;
+                if(session.tries > 3)
+                {
+                    session.error = String.format("Correct answer was: '%s' for '%s'", session.last_question.command, session.last_question.description);
+                    session.last_question = null;
+                    session.tries = 0;
+                }
+
+                if (session.last_question == null)
+                {
+                    quiz = VimKeys.randomEnum();
+                    session.last_question = quiz;
+                }
+                else
+                    quiz = session.last_question;
+                data.put("question", quiz.description);
+                data.put("session",session);
+                String s = t.apply(co);
+                response.content(s);
+            }
+            catch(Exception e)
+            {
+                response.content("PANIC:" + e.toString());
+            }
             response.end();
         }
     }

@@ -8,6 +8,9 @@ import org.webbitserver.HttpHandler;
 import org.webbitserver.HttpRequest;
 import org.webbitserver.HttpResponse;
 import org.yarr.Session;
+import org.yarr.VimKeys;
+
+import java.net.URLDecoder;
 
 /**
  * 09.06.2014 at 13:53
@@ -27,7 +30,7 @@ public class Validator implements HttpHandler
     }
     enum Actions
     {
-        checkAnswer, startGame, endGame, NoAction
+        checkAnswer, startGame, endGame, setName, NoAction
     }
     public static class ValidatorHandler implements  Runnable
     {
@@ -59,7 +62,35 @@ public class Validator implements HttpHandler
             {
                 case checkAnswer:
                     if (s.gameStarted())
-                        s.incrementScore(1);
+                    {
+                        try
+                        {
+                            String needle =request.queryParam("answer");
+                            if (needle != null)
+                            {
+                                VimKeys answer = VimKeys.byCommand(needle);
+                                if (answer != null && s.last_question.equals(answer))
+                                {
+                                    log.info("Correct answer!");
+                                    s.incrementScore(1);
+                                    s.last_question = null;
+                                    s.error = null;
+                                    s.tries = 0;
+                                }
+                                else if(answer != null)
+                                {
+                                    s.tries++;
+                                    s.error = String.format("Nope, '%s' is '%s'",answer.command, answer.description);
+                                }
+                                else
+                                {
+                                    s.tries++;
+                                    s.error = "No!";
+                                }
+                            }
+                        }
+                        catch(Exception e){ log.info("Incorrect answer or some shit", e);}
+                    }
                     break;
                 case startGame:
                     if(!s.gameStarted())
@@ -73,6 +104,13 @@ public class Validator implements HttpHandler
                 case endGame:
                     if(s.gameStarted())
                         s.endGame();
+                    break;
+                case setName:
+                    String name = request.queryParam("name");
+                    if (name != null)
+                        s.setName(name);
+                    else
+                       s.setName("kewl hax0r");
                     break;
                 case NoAction:
                     break;

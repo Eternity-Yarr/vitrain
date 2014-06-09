@@ -14,9 +14,12 @@ public class Session
     public double top_rate;
     private long started_at;
     private boolean game_started;
+    public VimKeys last_question;
+    private int answered;
     private String name;
     public double rate;
-
+    public String error;
+    public int tries;
     public void setScore(int score)
     {
         this.score = score;
@@ -34,6 +37,11 @@ public class Session
         score = 0;
         game_started = true;
         started_at = System.currentTimeMillis();
+        answered = 0;
+    }
+    public void answer()
+    {
+        answered++;
     }
     public boolean gameStarted()
     {
@@ -72,5 +80,6 @@ public class Session
         top_score = 0;
         game_started = false;
         name = "";
+        answered = 0;
     }
 }
